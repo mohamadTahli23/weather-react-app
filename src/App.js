@@ -17,23 +17,52 @@ const theme = createTheme({
   },
 });
 
+let cancelAxios = null;
+
 function App() {
-  const [temp, setTemp] = useState(null);
+  const [temp, setTemp] = useState({
+    number: null,
+    description: "",
+    min: null,
+    max: null,
+    icon: null,
+  });
 
   useEffect(() => {
     axios
-      .get("/user?ID=12345")
+      .get(
+        "https://api.openweathermap.org/data/2.5/weather?q=Riyadh,sa&APPID=bcf36eae960240db3dc2c573ba411286",
+        {
+          cancelToken: new axios.CancelToken((c) => {
+            cancelAxios = c;
+          }),
+        }
+      )
       .then(function (response) {
         // handle success
-        console.log(response);
+        const responseTemp = Math.round(response.data.main.temp - 272.15);
+        const min = Math.round(response.data.main.temp_min - 272.15);
+        const max = Math.round(response.data.main.temp_max - 272.15);
+        const description = response.data.weather[0].description;
+        const responceIcon = response.data.weather[0].icon;
+
+        setTemp({
+          number: responseTemp,
+          min,
+          max,
+          description,
+          icon: `https://openweathermap.org/img/wn/${responceIcon}@2x.png`,
+        });
+        console.log(responceIcon);
       })
       .catch(function (error) {
         // handle error
         console.log(error);
-      })
-      .finally(function () {
-        // always executed
       });
+
+    return () => {
+      cancelAxios();
+    };
   }, []);
 
   return (
@@ -93,20 +122,26 @@ function App() {
                   {/* DEGREE & DESCRIPTIONS */}
                   <div>
                     {/* TEMP */}
-                    <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       <Typography
                         style={{ textAlign: "right" }}
                         variant="h1"
                         gutterBottom
                       >
-                        38
+                        {temp.number}
                       </Typography>
-                      {/* TODO: TEMP IMAGE */}
+                      <img alt="" src={temp.icon} />
                     </div>
                     {/* === TEMP === */}
 
                     <Typography variant="h6" gutterBottom>
-                      broken cloud
+                      {temp.description}
                     </Typography>
                     {/* MAI & MAX */}
                     <div
@@ -116,9 +151,9 @@ function App() {
                         alignItems: "center",
                       }}
                     >
-                      <h5>الصغرى: 34</h5>
+                      <h5>الصغرى: {temp.min}</h5>
                       <span style={{ margin: "0 5px" }}>|</span>
-                      <h5>الكبرى: 40</h5>
+                      <h5>الكبرى: {temp.max}</h5>
                     </div>
                   </div>
                   {/* === DEGREE & DESCRIPTIONS === */}
