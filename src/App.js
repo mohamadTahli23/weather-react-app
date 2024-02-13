@@ -11,15 +11,31 @@ import Button from "@mui/material/Button";
 // EXTERNAL LIBRARY
 import CloudIcon from "@mui/icons-material/Cloud";
 import axios from "axios";
+import "./i18n";
+import { useTranslation } from "react-i18next";
+import moment from "moment";
+import "moment/min/locales";
+moment.locale("ar");
+
 const theme = createTheme({
   typography: {
     fontFamily: ["IBM"],
+  },
+  breakpoints: {
+    values: {
+      sm: 650,
+    },
   },
 });
 
 let cancelAxios = null;
 
 function App() {
+  const { t, i18n } = useTranslation();
+
+  // =========== STATES ========== //
+
+  const [dateAndTime, setDateAndTime] = useState("");
   const [temp, setTemp] = useState({
     number: null,
     description: "",
@@ -27,11 +43,35 @@ function App() {
     max: null,
     icon: null,
   });
+  const [locale, setLocale] = useState("ar");
+
+  const directions = locale == "ar" ? "rtl" : "ltr";
+
+  // =========== EVENT HANDLER ========== //
+
+  function handleLanguageClick() {
+    if (locale == "en") {
+      setLocale("ar");
+      i18n.changeLanguage("ar");
+      moment.locale("ar");
+    } else {
+      setLocale("en");
+      i18n.changeLanguage("en");
+      moment.locale("en");
+    }
+
+    setDateAndTime(moment().format("MMMM Do YYYY, h:mm:ss a"));
+  }
 
   useEffect(() => {
+    i18n.changeLanguage(locale);
+  }, []);
+
+  useEffect(() => {
+    setDateAndTime(moment().format("MMMM Do YYYY, h:mm:ss a"));
     axios
       .get(
-        "https://api.openweathermap.org/data/2.5/weather?q=Riyadh,sa&APPID=bcf36eae960240db3dc2c573ba411286",
+        "https://api.openweathermap.org/data/2.5/weather?q=Medina,sa&APPID=bcf36eae960240db3dc2c573ba411286",
         {
           cancelToken: new axios.CancelToken((c) => {
             cancelAxios = c;
@@ -89,7 +129,7 @@ function App() {
                 borderRadius: "15px",
                 boxShadow: "0px 11px 1px rgba( 0 , 0 , 0 , 0.05)",
               }}
-              dir="rtl"
+              dir={directions}
             >
               {/* CONTENT */}
               <div>
@@ -100,16 +140,16 @@ function App() {
                     alignItems: "end",
                     justifyContent: "start",
                   }}
-                  dir="rtl"
+                  dir={directions}
                 >
                   <Typography
                     style={{ marginRight: "20px", fontWeight: "600" }}
                     variant="h2"
                   >
-                    الرياض
+                    {t("Medina")}
                   </Typography>
                   <Typography style={{ marginRight: "20px" }} variant="h5">
-                    الإثنين 10/08/2024
+                    {dateAndTime}
                   </Typography>
                 </div>
                 {/* === CITY & TIME === */}
@@ -141,7 +181,7 @@ function App() {
                     {/* === TEMP === */}
 
                     <Typography variant="h6" gutterBottom>
-                      {temp.description}
+                      {t(temp.description)}
                     </Typography>
                     {/* MAI & MAX */}
                     <div
@@ -151,9 +191,13 @@ function App() {
                         alignItems: "center",
                       }}
                     >
-                      <h5>الصغرى: {temp.min}</h5>
+                      <h5>
+                        {t("min")}: {temp.min}
+                      </h5>
                       <span style={{ margin: "0 5px" }}>|</span>
-                      <h5>الكبرى: {temp.max}</h5>
+                      <h5>
+                        {t("max")}: {temp.max}
+                      </h5>
                     </div>
                   </div>
                   {/* === DEGREE & DESCRIPTIONS === */}
@@ -169,8 +213,12 @@ function App() {
             <div
               style={{ width: "100%", textAlign: "left", marginTop: "20px" }}
             >
-              <Button style={{ color: "white" }} variant="text">
-                إنجليزي
+              <Button
+                style={{ color: "white" }}
+                variant="text"
+                onClick={handleLanguageClick}
+              >
+                {locale == "en" ? "Arabic" : "انجليزي"}
               </Button>
             </div>
             {/* === TRANSITIONS CONTAINER === */}
