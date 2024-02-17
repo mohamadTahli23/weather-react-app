@@ -1,3 +1,18 @@
+# Weather React App
+a simple wather app with support Arabic and English languages .
+it show real time information like: city - date - temperature - min an max value 
+
+## Techniques
+
+- HTML5 - CSS3 - Javascript 
+
+- Material UI
+
+- React js
+  
+- Redux 
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -39,32 +54,14 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## Screenshot
+![weatherapp#1](https://github.com/mohamadTahli23/Logstic-co/assets/77210237/391f59c4-7bf7-41dc-aca2-26352250a036)
+![weatherapp#2](https://github.com/mohamadTahli23/Logstic-co/assets/77210237/32a3b565-da56-4c20-b29f-e4fc15d20978)
+![weatherapp#3](https://github.com/mohamadTahli23/Logstic-co/assets/77210237/964b24be-a050-46db-8335-2fc17e453e24)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Live Demo 
 
-### Code Splitting
+https://weatherapp-tahli.netlify.app/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
