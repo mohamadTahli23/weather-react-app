@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { createTheme, ThemeProvider } from "@mui/material";
 
@@ -8,9 +7,19 @@ import { useEffect, useState } from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+
+// REDUX Import
+import { useDispatch, useSelector } from "react-redux";
+import { changeResult } from "./weatherApiSlice";
+import { fetchWether } from "./weatherApiSlice";
+
 // EXTERNAL LIBRARY
 import CloudIcon from "@mui/icons-material/Cloud";
-import axios from "axios";
 import "./i18n";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
@@ -18,6 +27,11 @@ import "moment/min/locales";
 moment.locale("ar");
 
 const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ffffff",
+    },
+  },
   typography: {
     fontFamily: ["IBM"],
   },
@@ -28,24 +42,42 @@ const theme = createTheme({
   },
 });
 
-let cancelAxios = null;
+//let cancelAxios = null;
 
 function App() {
+  // REDUX
+  const result = useSelector((state) => {
+    return state.result;
+  });
+
+  const isLoading = useSelector((state) => {
+    return state.weather.isLoading;
+  });
+
+  const temp = useSelector((state) => {
+    return state.weather.weather;
+  });
+  const dispatch = useDispatch();
+
+  // ========/ REDUX ========/ //
+
   const { t, i18n } = useTranslation();
 
   // =========== STATES ========== //
 
   const [dateAndTime, setDateAndTime] = useState("");
-  const [temp, setTemp] = useState({
-    number: null,
-    description: "",
-    min: null,
-    max: null,
-    icon: null,
-  });
+
   const [locale, setLocale] = useState("ar");
 
   const directions = locale == "ar" ? "rtl" : "ltr";
+
+  const [city, setCity] = useState("Riyadh");
+
+  const handleChange = (event) => {
+    const targetCity = event.target.value;
+    dispatch(fetchWether({ targetCity }));
+    setCity(targetCity);
+  };
 
   // =========== EVENT HANDLER ========== //
 
@@ -64,45 +96,15 @@ function App() {
   }
 
   useEffect(() => {
+    // reducer
+    dispatch(fetchWether({ city }));
+
     i18n.changeLanguage(locale);
   }, []);
 
+  // ================== //
   useEffect(() => {
     setDateAndTime(moment().format("MMMM Do YYYY, h:mm:ss a"));
-    axios
-      .get(
-        "https://api.openweathermap.org/data/2.5/weather?q=Medina,sa&APPID=bcf36eae960240db3dc2c573ba411286",
-        {
-          cancelToken: new axios.CancelToken((c) => {
-            cancelAxios = c;
-          }),
-        }
-      )
-      .then(function (response) {
-        // handle success
-        const responseTemp = Math.round(response.data.main.temp - 272.15);
-        const min = Math.round(response.data.main.temp_min - 272.15);
-        const max = Math.round(response.data.main.temp_max - 272.15);
-        const description = response.data.weather[0].description;
-        const responceIcon = response.data.weather[0].icon;
-
-        setTemp({
-          number: responseTemp,
-          min,
-          max,
-          description,
-          icon: `https://openweathermap.org/img/wn/${responceIcon}@2x.png`,
-        });
-        console.log(responceIcon);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
-
-    return () => {
-      cancelAxios();
-    };
   }, []);
 
   return (
@@ -146,7 +148,7 @@ function App() {
                     style={{ marginRight: "20px", fontWeight: "600" }}
                     variant="h2"
                   >
-                    {t("Medina")}
+                    {t(city)}
                   </Typography>
                   <Typography style={{ marginRight: "20px" }} variant="h5">
                     {dateAndTime}
@@ -169,6 +171,13 @@ function App() {
                         alignItems: "center",
                       }}
                     >
+                      {/* Loading  */}
+                      {isLoading ? (
+                        <CircularProgress style={{ color: "white" }} />
+                      ) : (
+                        ""
+                      )}
+
                       <Typography
                         style={{ textAlign: "right" }}
                         variant="h1"
@@ -209,19 +218,66 @@ function App() {
             </div>
             {/* === CARD === */}
 
-            {/* TRANSITIONS CONTAINER */}
+            {/* Translation AND SELECT CITY CONTAINER */}
             <div
-              style={{ width: "100%", textAlign: "left", marginTop: "20px" }}
+              style={{
+                width: "100%",
+                display: "flex",
+                marginTop: "20px",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              dir={directions}
             >
               <Button
-                style={{ color: "white" }}
+                style={{ color: "white", height: "100%", margin: "0 5px" }}
                 variant="text"
                 onClick={handleLanguageClick}
               >
                 {locale == "en" ? "Arabic" : "انجليزي"}
               </Button>
+
+              {/* Select city */}
+              <FormControl fullWidth>
+                <InputLabel
+                  style={{ color: "white" }}
+                  id="demo-simple-select-label"
+                >
+                  {t("city")}
+                </InputLabel>
+                <Select
+                  style={{ height: "50px" }}
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="city"
+                  value={city}
+                  onChange={handleChange}
+                  sx={{
+                    color: "white",
+                    ".MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(228, 219, 233, 0.25)",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "white",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(228, 219, 233, 0.25)",
+                    },
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important",
+                    },
+                  }}
+                >
+                  <MenuItem value={"Riyadh"}>{t("Riyadh")}</MenuItem>
+                  <MenuItem value={"Medina"}>{t("Medina")}</MenuItem>
+                  <MenuItem value={"Jeddah"}>{t("Jeddah")}</MenuItem>
+                  <MenuItem value={"Dammam"}>{t("Dammam")}</MenuItem>
+                  <MenuItem value={"Tabuk"}>{t("Tabuk")}</MenuItem>
+                </Select>
+              </FormControl>
+              {/* === Select city === */}
             </div>
-            {/* === TRANSITIONS CONTAINER === */}
+            {/* === Translation AND SELECT CITY CONTAINER === */}
           </div>
           {/* === CONTENT CONTAINER === */}
         </Container>
